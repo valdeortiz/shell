@@ -2,7 +2,8 @@ import logging
 from cmd import cmd
 #archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log" # /var/log/usuarios_log
-archivo_personalHorarios = "personal_horarios_log" # /var/log/personal_horarios_log
+archivo_personal_horarios = "usuario_horarios_log" # /var/log/(usuario_horarios_log)
+archivo_personal_horarios = "Shell_transferencias" # /var/log/(usuario_horarios_log)
 
 class Comandos(cmd):
     """
@@ -43,9 +44,9 @@ class Comandos(cmd):
 
 if __name__ == '__main__':
     user = 'Admin'
-    logger = logging.getLogger(archivo_personalHorarios)
+    logger = logging.getLogger(archivo_personal_horarios)
     logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(archivo_personalHorarios) #/var/log/archivo_personal
+    fh = logging.FileHandler(archivo_personal_horarios) #/var/log/archivo_personal
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
