@@ -1,5 +1,6 @@
+#! /usr/bin/env python
 import logging
-import click
+from click_shell import shell
 import getpass
 
 #archivo = "/var/log" path para lfs
@@ -24,24 +25,24 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 fhp.setFormatter(formatter)
 log_error.addHandler(fhp)
 
-@click.group()
+@shell(prompt='shell> ', intro='**** Bienvenido ***')
 def cli():
     pass
 
 @cli.command()
-def bienvenida(args):
+def bienvenida():
     """emite un mensaje de bienvenida """
     print("Bienvenido!")
+    pass
 
 @cli.command()
-def salida( args):
+def salida():
     """Termina el loop y emite un mensaje de despedida """
     print("Hasta pronto!")
     return True 
     
-def log( args):
+def log(args):
         logging.info(f"Se ejecuto el comando -- {args}")
-
 
 
 if __name__ == '__main__':

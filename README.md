@@ -30,7 +30,7 @@ o decargar en el repositorio. En la seccion de clone, click en "Descargar en zip
 ### Ejecucion 🔩
 Desde nuestro interprete de comandos(host, ejemplo bash o zsh). Ingresamos a la carpeta donde se encuentra el repositorio previamente descargado o clonado. Ejecutamos:
 
-    python shell.py
+    python main.py
 
 ***
 
@@ -332,7 +332,7 @@ En caso de producirse un error se imprime un mensaje del error producido.
 
 > ***Ejecutar: ```pip install requirements.txt``` para instalar todas las dependencias.***
 
-[libreria click](https://click.palletsprojects.com/en/8.0.x/ "Construccion de un interprete de comandos")
+[libreria click-shell](https://click-shell.readthedocs.io/en/latest/ "Construccion de un interprete de comandos")
 
 [Libreria Psutil](https://psutil.readthedocs.io/en/latest/ "procesos/demonios")
 
