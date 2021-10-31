@@ -41,14 +41,13 @@ def cli():
 @cli.command()
 def bienvenida():
     """emite un mensaje de bienvenida """
-    print("Bienvenido!")
+    click.echo("Bienvenido!")
     pass
-
 
 @cli.command()
 def salida():
     """Termina el loop y emite un mensaje de despedida """
-    print("Hasta pronto!")
+    click.echo("Hasta pronto!")
     return True
 
 @cli.command()
@@ -57,26 +56,65 @@ def ir(path):
     """Cambio de Directorio."""
     try:
         os.chdir(path)
-        print("Directorio Actual: ", os.getcwd())
+        click.echo("Directorio Actual: ", os.getcwd())
     except:
-        print("No es posible acceder al directorio o no existe.")
+        click.echo("No es posible acceder al directorio o no existe.")
 
 @cli.command()
-@click.argument('SOURCE', type=click.Path(exists=True))
-@click.argument('DESTINATION', type=click.Path(exists=True))
-def copiar(SOURCE,DESTINATION):
+@click.argument('src', type=click.Path(exists=True))
+@click.argument('dst', type=click.Path(exists=True))
+def copiar(src,dst):
     """Copia un archivo a un directorio."""
     try:
-        shutil.copy(SOURCE, DESTINATION)
-        print(f"Se copio {click.format_filename(SOURCE)} a {click.format_filename(DESTINATION)} con exito.")
+        shutil.copy(src, dst)
+        click.echo(f"Se copio {click.format_filename(src)} a {click.format_filename(dst)} con exito.")
     except:
-        print("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicación"
+        click.echo("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicación"
               "del archivo o directorio")
 
+@cli.command()
+@click.argument('origen')
+@click.argument('destino')
+def renombrar(origen: str, destino: str) -> None:
+        """Renombrar un archivo o directorio
+        Recibe dos parametros-> <nombre_actual> <nombre_cambiado>
+        Manera de ejecutar: renombrar <nombre_actual> <nombre_a_cambiar>
+        """
+        try:
+            log(f"renombrar {origen} {destino} ")
+            os.rename(origen,destino)
+            click.echo(f"< origen > fue renombrado a < destino >")
+        except OSError:
+            click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>")
+        except Exception as e:
+            click.echo(f" Error: {e} -> al ejecutar <renombrar>")
+            log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
 
+#os.geteuid() para saber el userid
+    #os.getgid() para saber el grupid
+@cli.command()
+@click.argument('ruta', type=click.Path(exists=True))
+@click.argument('permisos', type=click.INT)
+def cambiarpermisos(ruta, permisos: int):
+    """
+    Cambiar los permisos de un archivo o directorio. 
+    Recibe dos parametros-> <ruta> <permisos> 
+    Manera de ejecutar:-> cambiarpermisos <ruta> <permisos>
+    """
+    try:
+        os.chmod(ruta,int(permisos,8)) #EL segundo parametro que recibe chmod debe ser entero y en octal
+        print("<",ruta,">", "permisos cambiado")
+    except OSError:
+        print("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <permisos>")
+    except Exception as e:
+        print(f"Error {e}-> Ejecute help <permisos> para mas informacion")
+        log_error.error(f"codigo del error: {e} -> al ejecutar <permisos> ")
+    
 
-def log(args):
-    logging.info(f"Se ejecuto el comando -- {args}")
+def log(comando: str) -> None:
+        logging.info(f"Se ejecuto el comando -- {comando}")
 
 
 if __name__ == '__main__':
@@ -95,7 +133,7 @@ if __name__ == '__main__':
     try:
         cli()  # iniciamos el loop para que capture los comandos ingresados
     except KeyboardInterrupt:  # en caso de ctrl + c se ejecuta una interrupcion del teclado y se termina la sesion
-        print(f"\nCierre de sesion : {user} - Interrupcion de teclado")
+        click.echo(f"\nCierre de sesion : {user} - Interrupcion de teclado")
         logger.info(f" {user} Cerro sesion por Interrupcion de teclado")
         exit()
     else:  # en cualquier caso. a la hora de salida se informa del cierre de sesion
