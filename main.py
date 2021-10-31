@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 import logging
+import click
 from click_shell import shell
 import getpass
+import os
 
 #archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log" # /var/log/usuarios_log
@@ -40,9 +42,28 @@ def salida():
     """Termina el loop y emite un mensaje de despedida """
     print("Hasta pronto!")
     return True 
-    
-def log(args):
-        logging.info(f"Se ejecuto el comando -- {args}")
+
+@cli.command()
+@click.argument('src', nargs=-1, type=click.STRING)
+@click.argument('dst', nargs=1, type=click.STRING)
+def renombrar(src: str, dst: str) -> None:
+        """Renombrar un archivo o directorio
+        Recibe dos parametros-> <nombre_actual> <nombre_cambiado>
+        Manera de ejecutar: renombrar <nombre_actual> <nombre_a_cambiar>
+        """
+        try:
+            log(f"renombrar {src} {dst} ")
+            os.rename(src,dst)
+            print("<",src,">", "fue renombrado a ","<",dst,">")
+        except OSError:
+            print("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>")
+        except Exception as e:
+            print(f" Error: {e} -> al ejecutar <renombrar>")
+            log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
+        
+def log(comando: str):
+        logging.info(f"Se ejecuto el comando -- {comando}")
 
 
 if __name__ == '__main__':
