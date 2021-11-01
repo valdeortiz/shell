@@ -54,23 +54,28 @@ def salida():
 @click.argument('path')
 def ir(path):
     """Cambio de Directorio."""
+    log(f'ir {path}')
     try:
         os.chdir(path)
-        click.echo("Directorio Actual: ", os.getcwd())
+        log("cambio al directorio: " + os.getcwd())
     except:
+        log("No es posible acceder al directorio o no existe.")
         click.echo("No es posible acceder al directorio o no existe.")
 
+
 @cli.command()
-@click.argument('src', type=click.Path(exists=True))
-@click.argument('dst', type=click.Path(exists=True))
-def copiar(src,dst):
+@click.argument('source', type=click.Path(exists=True))
+@click.argument('destination', type=click.Path(exists=True))
+def copiar(source,destination):
     """Copia un archivo a un directorio."""
+    log(f'copiar {source} {destination}')
     try:
-        shutil.copy(src, dst)
-        click.echo(f"Se copio {click.format_filename(src)} a {click.format_filename(dst)} con exito.")
+        shutil.copy(source, destination)
+        click.echo(f"Se copio {click.format_filename(source)} a {click.format_filename(destination)} con exito.")
+        log(f"Se copio {click.format_filename(source)} a {click.format_filename(destination)} con exito.")
     except:
-        click.echo("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicación"
-              "del archivo o directorio")
+        log_error.error("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicacion"
+              "de los archivos o directorios")
 
 @cli.command()
 @click.argument('origen')
