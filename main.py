@@ -5,10 +5,19 @@ import logging
 from click_shell import shell
 import getpass
 import os
+
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
 archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+
+
+
+# archivo = "/var/log" path para lfs
+archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
+archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
+archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+
 
 # Creamos nuestro logger principal y usamos el metodo basicConfig para configurar
 logging.basicConfig(level=logging.INFO,
@@ -29,11 +38,8 @@ fhp.setFormatter(formatter)
 log_error.addHandler(fhp)
 
 
-#UpdatePrompt=os.getcwd()
-def UpdatePrompt():#Esto no funciona por alguna razon
-    return f"shell>{os.getcwd()}>"
 
-@shell(prompt=f'[{UpdatePrompt()}]>', intro='**** Bienvenido ***')
+@shell(prompt=f'shell>', intro='**** Bienvenido ***')
 def cli():
     pass
 
@@ -43,6 +49,7 @@ def bienvenida():
     """emite un mensaje de bienvenida """
     click.echo("Bienvenido!")
     pass
+
 
 @cli.command()
 def salida():
@@ -72,10 +79,54 @@ def copiar(src,dst):
         click.echo("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicación"
               "del archivo o directorio")
 
+
+@cli.command()
+@click.argument('ruta',type=click.Path(exists=True))
+def ir(ruta):
+    """Cambio de Directorio."""
+    log(f'ir {ruta}')
+    try:
+        os.chdir(ruta)
+        click.echo(f"Directorio actual: {os.getcwd()}")
+        log("cambio al directorio: " + os.getcwd())
+    except:
+        log("No es posible acceder al directorio o no existe.")
+        click.echo("No es posible acceder al directorio o no existe.")
+
+
+@cli.command()
+@click.argument('source', type=click.Path(exists=True), nargs=1)
+@click.argument('destination', type=click.Path(exists=True), nargs=1)
+def copiar(origen,destino):
+    """Copia un archivo a un directorio."""
+    log(f'copiar {origen} {destino}')
+    try:
+        shutil.copy(origen, destino)
+        click.echo(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
+        log(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
+    except:
+        log_error.error("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicacion"
+              "de los archivos o directorios")
+
+@cli.command()
+@click.argument('usuario',nargs=1)
+@click.argument('grupo', nargs=1)
+@click.argument('archivo', type=click.Path(exists=True),nargs=1)
+def propietarios(usuario,grupo,archivo):
+    try:
+        log(f"propietarios {grupo}  {usuario} {archivo}")
+        os.chown(archivo, usuario, grupo)
+    except OSError:
+        click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <propietarios>")
+
+
+
 @cli.command()
 @click.argument('origen')
 @click.argument('destino')
 def renombrar(origen: str, destino: str) -> None:
+
         """Renombrar un archivo o directorio
         Recibe dos parametros-> <nombre_actual> <nombre_cambiado>
         Manera de ejecutar: renombrar <nombre_actual> <nombre_a_cambiar>
@@ -93,12 +144,13 @@ def renombrar(origen: str, destino: str) -> None:
 
 #os.geteuid() para saber el userid
     #os.getgid() para saber el grupid
+
+
 @cli.command()
 @click.argument('ruta', type=click.Path(exists=True))
 @click.argument('permisos', type=click.INT)
 def cambiarpermisos(ruta, permisos: int):
-    """
-    Cambiar los permisos de un archivo o directorio. 
+    """Cambiar los permisos de un archivo o directorio.
     Recibe dos parametros-> <ruta> <permisos> 
     Manera de ejecutar:-> cambiarpermisos <ruta> <permisos>
     """
@@ -115,6 +167,7 @@ def cambiarpermisos(ruta, permisos: int):
 
 def log(comando: str) -> None:
         logging.info(f"Se ejecuto el comando -- {comando}")
+
 
 
 if __name__ == '__main__':
@@ -138,5 +191,4 @@ if __name__ == '__main__':
         exit()
     else:  # en cualquier caso. a la hora de salida se informa del cierre de sesion
         logger.info(f"Cierre de sesion : {user}")
-
 
