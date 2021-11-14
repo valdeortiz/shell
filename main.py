@@ -5,7 +5,7 @@ import logging
 from click_shell import shell
 import getpass
 import os
-
+import ftplib
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
@@ -128,14 +128,99 @@ def cambiarpermisos(ruta, permisos: int):
     """
     try:
         os.chmod(ruta, int(permisos, 8))  # EL segundo parametro que recibe chmod debe ser entero y en octal
-        print("<", ruta, ">", "permisos cambiado")
+        click.echo("<", ruta, ">", "permisos cambiado")
     except OSError:
-        print("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
         log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <permisos>")
     except Exception as e:
-        print(f"Error {e}-> Ejecute help <permisos> para mas informacion")
+        click.echo(f"Error {e}-> Ejecute help <permisos> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <permisos> ")
 
+@cli.command()
+@click.argument('directorio_actual')
+@click.argument('directorio_cambiado')
+def mover(directorio_actual, directorio_cambiado):
+        """
+        Mover o renombrar un archivo o directorio. 
+        Recibe dos parametros-> <directorio_actual> <directorio_cambiado>
+                              o para renombrar un archivo: <nombre_actual> <nombre_cambiado>
+        Manera de ejecutar:-> mover <directorio_actual> <directorio_a_cambiar>
+                        -> renombrar: mover <nombre_actual> <nombre_a_cambiar>
+        """
+        log(f"mover {directorio_actual} {directorio_cambiado} ")
+        
+        
+        try:
+            shutil.move(directorio_actual, directorio_cambiado)
+            click.echo(f"<{directorio_actual}> fue movido a < {directorio_cambiado} >")
+        except OSError:
+            click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <mover>")
+        except Exception as e:
+            click.echo(f"Error {e}-> Ejecute help <mover> para mas informacion")
+            log_error.error(f" codigo del error: {e} -> Al ejecutar mover")
+
+@cli.command()
+@click.argument('usuario')
+def ccontra(usuario):
+        """ Cambiar la contrasenha de un usuario 
+        parametros:
+            -> [usuario]
+        Modo de Ejecucion:
+            -> ccontra [usuario]
+        """
+        #os.system(f"passwd {args}")
+        # contra_nueva = getpass.getpass("Introduce el nuevo password")
+        # click.echo(contra_nueva)
+        # verificar si se cambia contrase;a en usuarios_log
+        try:
+            log(f"ccontra {usuario} ")
+            # el nombre original debe de ser cambiarContra pero no tengo nh por eso uso ccontra
+            os.system(f"passwd {usuario}") 
+        except Exception as e:
+            click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
+            log_error.error(f"Error {e} -> al ejecutar <ccontra>")
+
+@cli.command()
+@click.argument('url')
+def ftp(url):
+        """Ftp brinda la posibilad de conectarse a traves del protocolo FTP. Posibilitando la tranferencia o descarga de un archivo
+        Parametros: [urlFtp] -> Url del servidor FTP.
+        Ejecucion: ftp [urlFtp]
+        """
+        #https://dlptest.com/ftp-test/
+
+        log(f"ftp {url} ")
+        try:
+            ftp = ftplib.FTP(url, timeout=100)
+            usuario = input("Introduce el usuario: ")
+            contra = getpass.getpass("Introduce la contrasenha: ")
+            ftp.login(usuario, contra)
+            #ftp.retrlines("LIST")
+            # (cmd, fp) cmd debe ser un RERT apropiado y fp el archivo destino
+            #FTP.storlines(cmd, fp) para subir archivos
+            #ftp.storbinary('STOR archivo2.txt', text_file)
+            #ftp.retrbinary('RETR FTP.txt', open('archivodescargado.txt', 'wb').write)
+            dec = int(input("1 - subir || 2 - descargar || 3 - salir -> "))
+            while dec != 3:
+                if dec == 1:
+                    archivo = input("Introduce el nombre del archivo(obs: con su extension al final): ")
+                    file = open(archivo, 'rb')
+                    ftp.storbinary(f'STOR {archivo}', file)
+                    ftp.retrlines('LIST')
+                else:
+                    ftp.retrlines('LIST')
+                    archivo = input("Introduce el nombre del archivo(obs: con su extension al final)")
+                    ftp.retrbinary(f'RETR {archivo}', open(archivo, 'wb').write)
+                with open("transferencia_log","a+") as transferencia:
+                    transferencia.write(f"se realizo una transferencia ftp con el {usuario} en {url} ")   
+                dec = int(input("1 - subir || 2 - descargar || 3 - salir"))
+
+            ftp.quit()
+        except Exception as e:
+            log_error.error(f"Error {e} -> al ejecutar <ftp>")
+            click.echo("no se pudo conectar")
+            click.echo(e)    
 
 def log(comando: str) -> None:
     logging.info(f"Se ejecuto el comando -- {comando}")
