@@ -161,6 +161,20 @@ def listardirectorios(l):
         log_error.error(f" codigo del error: {e} -> al ejecutar <listardirectorios>")
 
 @cli.command()
+@click.argument('direccion')
+def creardir(direccion):
+    """Crea un directorio en la ubicación especificada o en la actual"""
+    log(f"creadir {direccion}")
+    try:
+        os.mkdir(direccion)
+    except OSError:
+        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <creadir>")
+    except Exception as e:
+        click.echo(f" Error: {e} -> al ejecutar <creadir>")
+        log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
+
+@cli.command()
 @click.argument('origen')
 @click.argument('destino')
 def renombrar(origen: str, destino: str) -> None:
@@ -316,5 +330,6 @@ if __name__ == '__main__':
         exit()
     else:  # en cualquier caso. a la hora de salida se informa del cierre de sesion
         logger.info(f"Cierre de sesion : {user}")
+
 
 
