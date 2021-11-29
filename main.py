@@ -7,6 +7,7 @@ import os
 import getpass
 import ftplib
 import socket
+from os import listdir
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
@@ -76,7 +77,9 @@ def ir(ruta):
         log_error.error(f"codigo del error: {e} -> al ejecutar <ir> ")
 
 @cli.command()
+@click.argument('l', default='')
 def diractual():
+
     """Imprime en pantalla el directorio actual"""
     log("diractual")
     try:
@@ -126,13 +129,36 @@ def propietarios(usuario,grupo,archivo):
         log_error.error(f"codigo del error: {e} -> al ejecutar <propietarios> ")
 
 @cli.command()
-def nombrehost():
+@click.argument('l', default='')
+def nombrehost(l):
+    """Imprime en pantalla el nombre del host"""
+    log(f"nombrehost {l}")
     try:
-        log("nombrehost")
-        click.echo(socket.gethostname())
+        if (l == ''):
+            click.echo(socket.gethostname())
+        else:
+            click.echo("Error -> Argumentos extra")
+            log_error.error("Error -> Argumentos extra al ejecutar el comando <nombrehost>")
     except:
         click.echo("Error al ejecutar el comando nombrehost")
         log_error.error("Error al ejecutar el comando nombrehost")
+
+@cli.command()
+@click.argument('l', default='')
+def listardirectorios(l):
+    """Imprime en pantalla los archivos o directorios contenidos en el directorio actual"""
+    log(f"listardirectorios {l}")
+    try:
+        if(l==''):
+            lista=(listdir(os.getcwd()))
+            for x in range(len(lista)):
+                click.echo(lista[x])
+        else:
+            click.echo("Error -> Argumentos extra")
+            log_error.error("Error -> Argumentos extra al ejecutar el comando <listardirectorios>")
+    except click.ClickException as e:
+        click.echo(f" Error: {e} -> al ejecutar <listardirectorios>")
+        log_error.error(f" codigo del error: {e} -> al ejecutar <listardirectorios>")
 
 @cli.command()
 @click.argument('origen')
@@ -290,4 +316,5 @@ if __name__ == '__main__':
         exit()
     else:  # en cualquier caso. a la hora de salida se informa del cierre de sesion
         logger.info(f"Cierre de sesion : {user}")
+
 
