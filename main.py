@@ -3,13 +3,22 @@ import shutil
 import click
 import logging
 from click_shell import shell
-import getpass
 import os
+import getpass
 import ftplib
+import socket
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
 archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+
+
+
+# archivo = "/var/log" path para lfs
+archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
+archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
+archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+
 
 # Creamos nuestro logger principal y usamos el metodo basicConfig para configurar
 logging.basicConfig(level=logging.INFO,
@@ -30,10 +39,6 @@ fhp.setFormatter(formatter)
 log_error.addHandler(fhp)
 
 
-# UpdatePrompt=os.getcwd()
-#def UpdatePrompt():
-#    return f"shell>{os.getcwd()}>"
-
 
 @shell(prompt=f'shell>', intro='**** Bienvenido ***')
 def cli():
@@ -53,177 +58,215 @@ def salida():
     click.echo("Hasta pronto!")
     return True
 
-
 @cli.command()
-@click.argument('ruta',type=click.Path(exists=True))
+@click.argument('ruta',nargs=1)
 def ir(ruta):
     """Cambio de Directorio."""
     log(f'ir {ruta}')
     try:
-        os.chdir(ruta)
-        click.echo(f"Directorio actual: {os.getcwd()}")
-        log("cambio al directorio: " + os.getcwd())
-    except:
-        log("No es posible acceder al directorio o no existe.")
-        click.echo("No es posible acceder al directorio o no existe.")
-
+        if os.path.exists(ruta):
+            os.chdir(ruta)
+            click.echo(f"Directorio actual: {os.getcwd()}")
+            log("cambio al directorio: " + os.getcwd())
+        else:
+            click.echo("Error al ejecutar el comando <ir>, el directorio no existe")
+            log_error.error("Error al ejecutar el comando <ir>, el directorio no existe")
+    except click.ClickException as e:
+        click.echo(f"Error {e}-> Ejecute help <ir> para mas informacion")
+        log_error.error(f"codigo del error: {e} -> al ejecutar <ir> ")
 
 @cli.command()
-@click.argument('source', type=click.Path(exists=True), nargs=1)
-@click.argument('destination', type=click.Path(exists=True), nargs=1)
+def diractual():
+    """Imprime en pantalla el directorio actual"""
+    log("diractual")
+    try:
+        click.echo(f"Directorio actual: {os.getcwd()}")
+    except:
+        log_error.error("Error al mostrar el directorio actual.")
+
+@cli.command()
+@click.argument('origen',  nargs=1)
+@click.argument('destino', nargs=1)
 def copiar(origen,destino):
     """Copia un archivo a un directorio."""
     log(f'copiar {origen} {destino}')
     try:
-        shutil.copy(origen, destino)
-        click.echo(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
-        log(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
-    except:
-        log_error.error("Error al copiar documentos, no tiene los permisos necesarios o error al especificar la ubicacion"
-              "de los archivos o directorios")
+        if (os.path.exists(origen) and os.path.exists(destino)):
+            shutil.copy(origen, destino)
+            click.echo(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
+            log(f"Se copio {click.format_filename(origen)} a {click.format_filename(destino)} con exito.")
+        else:
+            click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <copiar>")
+    except OSError:
+        click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <copiar>")
+    except Exception as e:
+        print(f"Error {e}-> Ejecute help <copiar> para mas informacion")
+        log_error.error(f"codigo del error: {e} -> al ejecutar <copiar> ")
 
 @cli.command()
 @click.argument('usuario',nargs=1)
 @click.argument('grupo', nargs=1)
-@click.argument('archivo', type=click.Path(exists=True),nargs=1)
+@click.argument('archivo',nargs=1)
 def propietarios(usuario,grupo,archivo):
+    """Cambia el propietario de un directorio"""
     try:
-        log(f"propietarios {grupo}  {usuario} {archivo}")
-        os.chown(archivo, usuario, grupo)
+        if os.path.exists(archivo):
+            log(f"propietarios {grupo}  {usuario} {archivo}")
+            os.chown(archivo, usuario, grupo)
+        else:
+            click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <propietarios>")
     except OSError:
         click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
         log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <propietarios>")
+    except Exception as e:
+        print(f"Error {e}-> Ejecute help <propietarios> para mas informacion")
+        log_error.error(f"codigo del error: {e} -> al ejecutar <propietarios> ")
 
+@cli.command()
+def nombrehost():
+    try:
+        log("nombrehost")
+        click.echo(socket.gethostname())
+    except:
+        click.echo("Error al ejecutar el comando nombrehost")
+        log_error.error("Error al ejecutar el comando nombrehost")
 
 @cli.command()
 @click.argument('origen')
 @click.argument('destino')
 def renombrar(origen: str, destino: str) -> None:
-    """Renombrar un archivo o directorio
-    Recibe dos parametros-> <nombre_actual> <nombre_cambiado>
-    Manera de ejecutar: renombrar <nombre_actual> <nombre_a_cambiar>
-    """
-    try:
-        log(f"renombrar {origen} {destino} ")
-        os.rename(origen, destino)
-        click.echo(f" { origen } fue renombrado a { destino} >")
-    except OSError:
-        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
-        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>")
-    except Exception as e:
-        click.echo(f" Error: {e} -> al ejecutar <renombrar>")
-        log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
+
+        """Renombrar un archivo o directorio
+        Recibe dos parametros-> <nombre_actual> <nombre_cambiado>
+        Manera de ejecutar: renombrar <nombre_actual> <nombre_a_cambiar>
+        """
+        try:
+            log(f"renombrar {origen} {destino} ")
+            os.rename(origen,destino)
+            click.echo(f"< origen > fue renombrado a < destino >")
+        except OSError:
+            click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>")
+        except Exception as e:
+            click.echo(f" Error: {e} -> al ejecutar <renombrar>")
+            log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
+
+#os.geteuid() para saber el userid
+    #os.getgid() para saber el grupid
 
 
-# os.geteuid() para saber el userid
-# os.getgid() para saber el grupid
 @cli.command()
-@click.argument('ruta', type=click.Path(exists=True))
+@click.argument('ruta')
 @click.argument('permisos', type=click.INT)
-def cambiarpermisos(ruta, permisos: int):
-    """
-    Cambiar los permisos de un archivo o directorio.
-    Recibe dos parametros-> <ruta> <permisos>
+def cambiarpermisos(ruta, permisos: int):#Error int() can't convert non-string with explicit base
+    """Cambiar los permisos de un archivo o directorio.
+    Recibe dos parametros-> <ruta> <permisos> 
     Manera de ejecutar:-> cambiarpermisos <ruta> <permisos>
     """
     try:
-        os.chmod(ruta, int(permisos, 8))  # EL segundo parametro que recibe chmod debe ser entero y en octal
-        click.echo("<", ruta, ">", "permisos cambiado")
+        os.chmod(ruta,int(permisos,8)) #EL segundo parametro que recibe chmod debe ser entero y en octal
+        print("<",ruta,">", "permisos cambiado")
     except OSError:
-        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        print("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
         log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <permisos>")
     except Exception as e:
-        click.echo(f"Error {e}-> Ejecute help <permisos> para mas informacion")
+        print(f"Error {e}-> Ejecute help <permisos> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <permisos> ")
+
 
 @cli.command()
 @click.argument('directorio_actual')
 @click.argument('directorio_cambiado')
 def mover(directorio_actual, directorio_cambiado):
-        """
-        Mover o renombrar un archivo o directorio. 
-        Recibe dos parametros-> <directorio_actual> <directorio_cambiado>
-                              o para renombrar un archivo: <nombre_actual> <nombre_cambiado>
-        Manera de ejecutar:-> mover <directorio_actual> <directorio_a_cambiar>
-                        -> renombrar: mover <nombre_actual> <nombre_a_cambiar>
-        """
-        log(f"mover {directorio_actual} {directorio_cambiado} ")
-        
-        
-        try:
-            shutil.move(directorio_actual, directorio_cambiado)
-            click.echo(f"<{directorio_actual}> fue movido a < {directorio_cambiado} >")
-        except OSError:
-            click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
-            log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <mover>")
-        except Exception as e:
-            click.echo(f"Error {e}-> Ejecute help <mover> para mas informacion")
-            log_error.error(f" codigo del error: {e} -> Al ejecutar mover")
+    """
+    Mover o renombrar un archivo o directorio.
+    Recibe dos parametros-> <directorio_actual> <directorio_cambiado>
+                          o para renombrar un archivo: <nombre_actual> <nombre_cambiado>
+    Manera de ejecutar:-> mover <directorio_actual> <directorio_a_cambiar>
+                    -> renombrar: mover <nombre_actual> <nombre_a_cambiar>
+    """
+    log(f"mover {directorio_actual} {directorio_cambiado} ")
+
+    try:
+        shutil.move(directorio_actual, directorio_cambiado)
+        click.echo(f"<{directorio_actual}> fue movido a < {directorio_cambiado} >")
+    except OSError:
+        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <mover>")
+    except Exception as e:
+        click.echo(f"Error {e}-> Ejecute help <mover> para mas informacion")
+        log_error.error(f" codigo del error: {e} -> Al ejecutar mover")
+
 
 @cli.command()
 @click.argument('usuario')
 def ccontra(usuario):
-        """ Cambiar la contrasenha de un usuario 
-        parametros:
-            -> [usuario]
-        Modo de Ejecucion:
-            -> ccontra [usuario]
-        """
-        #os.system(f"passwd {args}")
-        # contra_nueva = getpass.getpass("Introduce el nuevo password")
-        # click.echo(contra_nueva)
-        # verificar si se cambia contrase;a en usuarios_log
-        try:
-            log(f"ccontra {usuario} ")
-            # el nombre original debe de ser cambiarContra pero no tengo nh por eso uso ccontra
-            os.system(f"passwd {usuario}") 
-        except Exception as e:
-            click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
-            log_error.error(f"Error {e} -> al ejecutar <ccontra>")
+    """ Cambiar la contrasenha de un usuario
+    parametros:
+        -> [usuario]
+    Modo de Ejecucion:
+        -> ccontra [usuario]
+    """
+    # os.system(f"passwd {args}")
+    # contra_nueva = getpass.getpass("Introduce el nuevo password")
+    # click.echo(contra_nueva)
+    # verificar si se cambia contrase;a en usuarios_log
+    try:
+        log(f"ccontra {usuario} ")
+        # el nombre original debe de ser cambiarContra pero no tengo nh por eso uso ccontra
+        os.system(f"passwd {usuario}")
+    except Exception as e:
+        click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
+        log_error.error(f"Error {e} -> al ejecutar <ccontra>")
+
 
 @cli.command()
 @click.argument('url')
 def ftp(url):
-        """Ftp brinda la posibilad de conectarse a traves del protocolo FTP. Posibilitando la tranferencia o descarga de un archivo
-        Parametros: [urlFtp] -> Url del servidor FTP.
-        Ejecucion: ftp [urlFtp]
-        """
-        #https://dlptest.com/ftp-test/
+    """Ftp brinda la posibilad de conectarse a traves del protocolo FTP. Posibilitando la tranferencia o descarga de un archivo
+    Parametros: [urlFtp] -> Url del servidor FTP.
+    Ejecucion: ftp [urlFtp]
+    """
+    # https://dlptest.com/ftp-test/
 
-        log(f"ftp {url} ")
-        try:
-            ftp = ftplib.FTP(url, timeout=100)
-            usuario = input("Introduce el usuario: ")
-            contra = getpass.getpass("Introduce la contrasenha: ")
-            ftp.login(usuario, contra)
-            #ftp.retrlines("LIST")
-            # (cmd, fp) cmd debe ser un RERT apropiado y fp el archivo destino
-            #FTP.storlines(cmd, fp) para subir archivos
-            #ftp.storbinary('STOR archivo2.txt', text_file)
-            #ftp.retrbinary('RETR FTP.txt', open('archivodescargado.txt', 'wb').write)
-            dec = int(input("1 - subir || 2 - descargar || 3 - salir -> "))
-            while dec != 3:
-                if dec == 1:
-                    archivo = input("Introduce el nombre del archivo(obs: con su extension al final): ")
-                    file = open(archivo, 'rb')
-                    ftp.storbinary(f'STOR {archivo}', file)
-                    ftp.retrlines('LIST')
-                else:
-                    ftp.retrlines('LIST')
-                    archivo = input("Introduce el nombre del archivo(obs: con su extension al final)")
-                    ftp.retrbinary(f'RETR {archivo}', open(archivo, 'wb').write)
-                with open("transferencia_log","a+") as transferencia:
-                    transferencia.write(f"se realizo una transferencia ftp con el {usuario} en {url} ")   
-                dec = int(input("1 - subir || 2 - descargar || 3 - salir"))
+    log(f"ftp {url} ")
+    try:
+        ftp = ftplib.FTP(url, timeout=100)
+        usuario = input("Introduce el usuario: ")
+        contra = getpass.getpass("Introduce la contrasenha: ")
+        ftp.login(usuario, contra)
+        # ftp.retrlines("LIST")
+        # (cmd, fp) cmd debe ser un RERT apropiado y fp el archivo destino
+        # FTP.storlines(cmd, fp) para subir archivos
+        # ftp.storbinary('STOR archivo2.txt', text_file)
+        # ftp.retrbinary('RETR FTP.txt', open('archivodescargado.txt', 'wb').write)
+        dec = int(input("1 - subir || 2 - descargar || 3 - salir -> "))
+        while dec != 3:
+            if dec == 1:
+                archivo = input("Introduce el nombre del archivo(obs: con su extension al final): ")
+                file = open(archivo, 'rb')
+                ftp.storbinary(f'STOR {archivo}', file)
+                ftp.retrlines('LIST')
+            else:
+                ftp.retrlines('LIST')
+                archivo = input("Introduce el nombre del archivo(obs: con su extension al final)")
+                ftp.retrbinary(f'RETR {archivo}', open(archivo, 'wb').write)
+            with open("transferencia_log", "a+") as transferencia:
+                transferencia.write(f"se realizo una transferencia ftp con el {usuario} en {url} ")
+            dec = int(input("1 - subir || 2 - descargar || 3 - salir"))
 
-            ftp.quit()
-        except Exception as e:
-            log_error.error(f"Error {e} -> al ejecutar <ftp>")
-            click.echo("no se pudo conectar")
-            click.echo(e)    
+        ftp.quit()
+    except Exception as e:
+        log_error.error(f"Error {e} -> al ejecutar <ftp>")
+        click.echo("no se pudo conectar")
+        click.echo(e)
 
 def log(comando: str) -> None:
-    logging.info(f"Se ejecuto el comando -- {comando}")
+        logging.info(f"Se ejecuto el comando -- {comando}")
+
 
 
 if __name__ == '__main__':
