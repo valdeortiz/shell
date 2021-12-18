@@ -307,7 +307,19 @@ def ftp(url):
 def log(comando: str) -> None:
         logging.info(f"Se ejecuto el comando -- {comando}")
 
+@cli.command()
+@click.argument('ruta', required=True,)
+def uso_disco(ruta):
+    """Muestra el uso en disco """
+    disk_usage = shutil.disk_usage(path=ruta)
+    click.echo("Espacio total: {:.2f} GB.".format(to_gb(disk_usage.total)))
+    click.echo("Espacio libre: {:.2f} GB.".format(to_gb(disk_usage.free)))
+    click.echo("Espacio usado: {:.2f} GB.".format(to_gb(disk_usage.used)))
 
+
+def to_gb(bytes):
+    "Convierte bytes a gigabytes."
+    return bytes / 1024**3
 
 if __name__ == '__main__':
     user = getpass.getuser()  # capturamos el nombre de usuario de la pc.
