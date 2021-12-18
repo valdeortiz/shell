@@ -332,6 +332,27 @@ def to_gb(bytes):
     "Convierte bytes a gigabytes."
     return bytes / 1024**3
 
+@cli.command()
+@click.argument('nombre')
+@click.option('entrada', prompt="Hora de entrada-09:00", default="09:00", required=True,)
+@click.option('salida', prompt="Hora de salida-09:00", default="09:00", required=True,)
+@click.option('ip')
+def nuevo_usuario(nombre, entrada, salida, ip):
+        """Crea un nuevo usuario en el sistema. Los datos se guardan dentro del archivo /var/log/usuarios_log.
+        parametros:
+            -> [nombre de usuario] [hora de entrada] [hora de salida] [ip de conexion]
+        Ejecucion:
+            -> usuario <nombre de usuario> <hora de entrada> <hora de salida> <ip de conexion>
+        """
+
+        args = f"{nombre} {entrada} {salida} {ip}"
+        log(f"usuario {args} ")
+    
+        with open(archivo_usuario, "a") as f: # abrimos el archivo y colocamos la informacion al final del archivo
+            f.write(args + "\n")
+            click.echo("Usuario Registrado en /var/log/usuarios_log")
+
+
 if __name__ == '__main__':
     user = getpass.getuser()  # capturamos el nombre de usuario de la pc.
 
