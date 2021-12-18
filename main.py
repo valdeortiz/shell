@@ -311,10 +311,21 @@ def log(comando: str) -> None:
 @click.argument('ruta', required=True,)
 def uso_disco(ruta):
     """Muestra el uso en disco """
+    log(f"uso-disco {ruta}")
     disk_usage = shutil.disk_usage(path=ruta)
     click.echo("Espacio total: {:.2f} GB.".format(to_gb(disk_usage.total)))
     click.echo("Espacio libre: {:.2f} GB.".format(to_gb(disk_usage.free)))
     click.echo("Espacio usado: {:.2f} GB.".format(to_gb(disk_usage.used)))
+
+@cli.command()
+@click.argument('comando', required=True,)
+def ejecutar(comando):
+    """ejecuta cualquier comando """
+    log(f"ejecutar {comando}")
+    try:
+        os.system(command=comando)
+    except Exception as e:
+        click.echo(f"Error al ejecutar el comando {comando}\nError: {e}")
 
 
 def to_gb(bytes):
