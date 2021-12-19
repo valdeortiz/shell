@@ -8,6 +8,8 @@ import getpass
 import ftplib
 import socket
 from os import listdir
+import fileinput
+import crypt
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
@@ -243,7 +245,8 @@ def mover(directorio_actual, directorio_cambiado):
 
 @cli.command()
 @click.argument('usuario')
-def ccontra(usuario):
+@click.option('--contra', prompt="Introduce la contrasena: ", hide_input=True, required=True)
+def ccontra(usuario, contra):
     """ Cambiar la contrasenha de un usuario
     parametros:
         -> [usuario]
@@ -255,9 +258,24 @@ def ccontra(usuario):
     # click.echo(contra_nueva)
     # verificar si se cambia contrase;a en usuarios_log
     try:
-        log(f"ccontra {usuario} ")
-        # el nombre original debe de ser cambiarContra pero no tengo nh por eso uso ccontra
-        os.system(f"passwd {usuario}")
+        log(f"ccontra {usuario}, contrasena: {contra}")
+        # TODO: Cambiar, no se puede utilizar passwd
+        # os.system(f"passwd {usuario}")
+        archivo = "/etc/shadow"
+#         # zeus:$6$jq62gTbU$kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1:17739:0:99999:7:::
+#         Los campos se separan por :; el primer campo es el usuario y el segundo, el hash de su password. Este hash tiene la forma $id$salt$hashed, y cada parte significa algo:
+
+        # 6 → es algoritmo usado para el hash, donde “6” significa SHA-512.
+        # jq62gTbU → el algoritmo SHA-512 requiere de un salt para combinar con la contraseña antes del hash, por seguridad.
+        # kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1 → este es el hash propiamente dicho.
+        # TODO: Cambiar a /etc/shadow
+        with fileinput.FileInput(archivo_usuario, backup='_old', inplace=True) as file:
+            for line in file:
+                if usuario in line:
+                    datos = line.split(' ')
+                    # datos = line.split(':')
+                    contra_hash = crypt.crypt(contra, salt=crypt.mksalt())
+                    print(line.replace(datos[2], contra_hash), end='')
     except Exception as e:
         click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
         log_error.error(f"Error {e} -> al ejecutar <ccontra>")
@@ -334,9 +352,9 @@ def to_gb(bytes):
 
 @cli.command()
 @click.argument('nombre')
-@click.option('entrada', prompt="Hora de entrada-09:00", default="09:00", required=True,)
-@click.option('salida', prompt="Hora de salida-09:00", default="09:00", required=True,)
-@click.option('ip')
+@click.option('--entrada', prompt="Hora de entrada-09:00", default="09:00", required=True,)
+@click.option('--salida', prompt="Hora de salida-09:00", default="09:00", required=True,)
+@click.option('--ip', prompt="Ip de conexion", default="127.0.0.0", required=True)
 def nuevo_usuario(nombre, entrada, salida, ip):
         """Crea un nuevo usuario en el sistema. Los datos se guardan dentro del archivo /var/log/usuarios_log.
         parametros:
