@@ -177,6 +177,39 @@ def creardir(direccion):
         log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
 
 @cli.command()
+@click.argument('opcion')
+@click.argument('PID')
+def demonio(opcion, PID):
+    """Levanta o apaga demonios. Necesita como parametro
+    la accion y el ID de proceso en caso de apagar,
+    y el archivo a ejecutar en caso de levantar."""
+    try:
+        if (opcion == 'levantar'):
+            try:
+                subprocess.Popen(PID)
+                log(f"demonio {opcion} {PID}")
+            except Exception as e:
+                print(e)
+                print('Ocurrio un error o el parametro introducido es invalido.')
+                log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
+        elif (opcion == 'apagar'):
+            try:
+                # SIGKILL no puede ser ignorado, SIGTERM si
+                pid = int(PID)
+                os.kill(pid, signal.SIGTERM)
+                os.kill(pid, signal.SIGKILL)
+                log(f"demonio {opcion} {PID}")
+            except Exception as e:
+                print(e)
+                print('Ocurrio un error o el parametro introducido es invalido.')
+                log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
+    except Exception as e:
+        print(e)
+        print('Ocurrio un error o el comando se utilizo incorrectamente.')
+        log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
+        
+        
+@cli.command()
 @click.argument('origen')
 @click.argument('destino')
 def renombrar(origen: str, destino: str) -> None:
