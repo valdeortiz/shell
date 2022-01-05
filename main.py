@@ -302,13 +302,26 @@ def ccontra(usuario, contra):
         # jq62gTbU → el algoritmo SHA-512 requiere de un salt para combinar con la contraseña antes del hash, por seguridad.
         # kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1 → este es el hash propiamente dicho.
         # TODO: Cambiar a /etc/shadow
+        existe_usuario = False
         with fileinput.FileInput(archivo_usuario, backup='_old', inplace=True) as file:
             for line in file:
-                if usuario in line:
-                    datos = line.split(' ')
+                datos: list = line.split(' ')
+                if usuario == datos[0]:
                     # datos = line.split(':')
                     contra_hash = crypt.crypt(contra, salt=crypt.mksalt())
-                    print(line.replace(datos[2], contra_hash), end='')
+                    # print(line.replace(datos[2], contra_hash))
+                    datos.insert(1, contra_hash)
+                    datos.pop()
+                    print(*datos)
+                    existe_usuario = True
+                else:
+                    if line != '\n':
+                        print(line.replace('\n', ''))
+            else:
+                if not existe_usuario:
+                    raise Exception("Usuario incorrecto")
+
+                    
     except Exception as e:
         click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
         log_error.error(f"Error {e} -> al ejecutar <ccontra>")
