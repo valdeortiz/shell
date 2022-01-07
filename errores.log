@@ -1,0 +1,11 @@
+2022-01-06 15:25:32,559 - root - ERROR - Error al ejecutar el comando <ir>, el directorio no existe
+2022-01-06 23:32:02,119 - root - ERROR - Error Usuario incorrecto -> al ejecutar <ccontra>
+2022-01-06 21:34:03,831 - root - ERROR - nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <copiar>
+2022-01-06 21:35:34,039 - root - ERROR - nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>
+2022-01-06 21:36:00,846 - root - ERROR - nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>
+2022-01-06 21:58:24,652 - root - ERROR -  codigo del error: name 'signal' is not defined -> al ejecutar <demonio>
+2022-01-06 22:07:26,357 - root - ERROR -  codigo del error: name 'signal' is not defined -> al ejecutar <demonio>
+2022-01-06 22:25:53,900 - root - ERROR -  codigo del error: name 'subprocess' is not defined -> al ejecutar <demonio>
+2022-01-06 22:26:59,952 - root - ERROR -  codigo del error: 'int' object is not iterable -> al ejecutar <demonio>
+2022-01-06 22:28:10,609 - root - ERROR -  codigo del error: [Errno 2] No such file or directory: '312' -> al ejecutar <demonio>
+2022-01-06 22:28:30,932 - root - ERROR -  codigo del error: [Errno 3] No such process -> al ejecutar <demonio>

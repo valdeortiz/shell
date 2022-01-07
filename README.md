@@ -16,9 +16,8 @@ Ejecutar: ``` git clone https://github.com/valdeortiz/shell.git ```
 o decargar en el repositorio. En la seccion de clone, click en "Descargar en zip"
 
 
-
-
 ***
+
 ## Pre-requisitos 📋.
 
 - Se necesita tener instalado python 3.6 en adelante, que viene instalado en la mayoria de distribuciones GNU/Linux. Para asegurarse cual version se encuentra instalado en tu maquina. Ejecuta: `python --version`
@@ -27,18 +26,14 @@ o decargar en el repositorio. En la seccion de clone, click en "Descargar en zip
 
 - Seguir las intruciones del enunciado anterior para la Descarga del repositorio.
 
-***
+
 ### Ejecucion 🔩
 Desde nuestro interprete de comandos(host, ejemplo bash o zsh). Ingresamos a la carpeta donde se encuentra el repositorio previamente descargado o clonado. Ejecutamos:
 
     python main.py
-    
-***
-## Instalación(opcional) :arrow_backward:
-Utilizar el comando: 'pip install <ubicación donde descargo el archivo>'
-Luego para ejecutar en cualquier momento desde linea de comando utilizar: 'shell'
 
 ***
+
 ## Construido con 🛠️
 
 - [Python version >3.6.X](https://www.python.org/ "Pagina oficial del lenguaje de programacion Python")
@@ -337,7 +332,9 @@ En caso de producirse un error se imprime un mensaje del error producido.
 
 > ***Ejecutar: ```pip install requirements.txt``` para instalar todas las dependencias.***
 
-[libreria click-shell](https://click-shell.readthedocs.io/en/latest/ "Construccion de un interprete de comandos")
+[libreria click-shell](https://click-shell.readthedocs.io/en/latest/ "Recursion del CLI")
+
+[libreria click](https://click.palletsprojects.com/en/8.0.x/ "Construccion del CLI")
 
 [Libreria Psutil](https://psutil.readthedocs.io/en/latest/ "procesos/demonios")
 
@@ -353,4 +350,3 @@ En caso de producirse un error se imprime un mensaje del error producido.
 
 * **Valdemar Ortiz** - [valdeortiz](https://github.com/valdeortiz)
 * **Alcides Aveiro** -  [AlcidesAveiro](https://github.com/AlcidesAveiro)
-* **Martin Portillo** -  [hummer49](https://github.com/hummer49)
