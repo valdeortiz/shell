@@ -12,17 +12,18 @@ import fileinput
 import crypt
 import signal
 import subprocess
+from datetime import datetime
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+# archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
 
 
 
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+archivo_tranaferencias = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
 
 
 # Creamos nuestro logger principal y usamos el metodo basicConfig para configurar
@@ -425,9 +426,70 @@ def nuevo_usuario(nombre, entrada, salida, ip):
             f.write(args + "\n")
             click.echo("Usuario Registrado en /var/log/usuarios_log")
 
+def capture_ip():
+    """Hacemos ping a 8.8.8.8 en el puerto 80 y solicitamos los datos que nos devulve una tupla (ipPrivada, tiempo)
+        y como nos interesa solo la ip privada accedemos al primer elemento y retornamos.
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip_conexion = s.getsockname()[0]
+        s.close()
+        return ip_conexion
+    except Exception:
+        return "0.0.0.0"
+
+def ipVerificacion(ipList, ipDeConexion):
+    """verificamos que la ip de conexion se encuentre en la lista de posibles ips registradas en usuarios_log """
+    for ip in ipList:
+        if ip == ipDeConexion:
+            return ipDeConexion
+    else:
+        return f"Ip no registrado = {ipDeConexion}"
+
+def inicio_sesion(user, ip):
+    """Funcion para verificar la existencia del usuario, si se encuentra en horario laboral y con alguna ip reconocidad
+        Parametros: [user] -> Es el nombre de usuario de la maquina que se conecto.
+                    [ip] -> ip de la maquina conectada.
+        Funcion:- Hacemos uso de dos archivos, el principal usuarios_log que es donde se encuentra los datos de los usuarios registrados
+            y personal_horarios_log donde guardamos las conexiones y si fue en horario o no. Ambos son abierto en modo append(agregar).
+            - hacemos uso de los metodos proporcionados por datetime para la manipulacion de fechas.
+        Excepciones: La primera excepcion es en el caso de que no exista el archivo usuarios_log. Nos devuelve un aviso.
+            Tenemos una excepcion en el caso de que no se encuentre registrado el usuario en el archivo usuarios_log
+    """
+    usuario = user
+    ipDeConexion = ip
+    horario_actual = datetime.now()
+    try:
+        with open(archivo_usuario,"r+") as archivoUsuario: 
+            try:
+                for linea in archivoUsuario:
+                    usuario_info = linea.split() 
+                    if usuario == usuario_info[0]:
+                        hora_entrada = datetime.strptime(usuario_info[1], "%H:%M") 
+                        hora_salida = datetime.strptime(usuario_info[2], "%H:%M") 
+                        ips = usuario_info[3:]
+                        strIp = ipVerificacion(ips, ipDeConexion)
+                        if hora_entrada.strftime("%H:%M") <= horario_actual.strftime("%H:%M") <= hora_salida.strftime("%H:%M"):
+                            horario_actual = horario_actual.strftime("%m/%d/%Y, %H:%M:%S")
+                            return f"{ horario_actual } - {usuario} Se conecto dentro de su horario, IP: {strIp}"
+                        else:
+                            horario_actual = horario_actual.strftime("%m/%d/%Y, %H:%M:%S")
+                            return f"{horario_actual} - {usuario} Se conecto fuera del horario, IP: {strIp}"
+                        break
+                else:
+                    raise Exception("No se encontro el usuario")
+            except Exception as e:
+                horario_actual = horario_actual.strftime("%m/%d/%Y, %H:%M:%S")
+                return f"{horario_actual}: Usuario desconocido se conecto, IP: {ipDeConexion}"
+    except FileNotFoundError:
+        return "No hay usuarios registrados en usuarios_log. Para un nuevo usuario ejecute el comando <nuevo-usuario>"
+
+
 
 if __name__ == '__main__':
     user = getpass.getuser()  # capturamos el nombre de usuario de la pc.
+    ip_conexion = capture_ip() #capturamos la ip de la pc 
 
     # creamos un nuevo log con nombre sesion_log
     logger = logging.getLogger(archivo_personal_horarios)
@@ -438,8 +500,10 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     logger.addHandler(fh)
-    logger.info(f'Inicio de sesion de {user}')
     try:
+        result = inicio_sesion(user, ip_conexion) # verificamos el inicio de sesion
+        print(result)
+        logger.info(f'Inicio de sesion de {user}')
         cli()  # iniciamos el loop para que capture los comandos ingresados
     except KeyboardInterrupt:  # en caso de ctrl + c se ejecuta una interrupcion del teclado y se termina la sesion
         click.echo(f"\nCierre de sesion : {user} - Interrupcion de teclado")
