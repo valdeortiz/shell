@@ -13,24 +13,6 @@ import crypt
 import signal
 import subprocess
 from datetime import datetime
-<<<<<<< HEAD
-# archivo = "/var/log" path para lfs
-archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
-archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-# archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
-
-
-
-#variables globales del código:
-#archivo_usuario: contiene el path junto al nombre del archivo donde se guardará la 
-#información de los usuarios creados con la shell, la información consiste en su nombre, 
-#hora de entrada, hora de salida y su ip de conexión
-# archivo = "/var/log" path para lfs
-archivo_usuario = "/var/log/usuarios.log"
-archivo_personal_horarios = "/var/log/usuario_horarios.log"
-archivo_personal_transferencias = "/var/log/Shell_transferencias.log"
-=======
->>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 
 
 
@@ -169,10 +151,7 @@ def nombrehost(l):
         click.echo("Error al ejecutar el comando nombrehost")
         log_error.error("Error al ejecutar el comando nombrehost")
 
-<<<<<<< HEAD
-=======
         
->>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 #comando para listar los directorios y archivos dentro de un directorio, imprime en
 #pantalla todos los directorios y archivos dentro del directorio actual,el comando recibe un argumento, este argumento debe ser vacio, 
 #esto es para verificar que el comando no reciba argumentos demas, es posible cambiar la forma en la los elementos se
@@ -208,12 +187,8 @@ def creardir(direccion):
     except Exception as e:
         click.echo(f" Error: {e} -> al ejecutar <creadir>")
         log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
-<<<<<<< HEAD
-#comando para levantar o apagar un demonio
-=======
 #comando para levantar o apagar un demonio, utiliza el paquete signal y la libreria subprocess
 #recibe como parametro la opcion ya sea levantar o apagar y el pid del proceso.
->>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 @cli.command()
 @click.argument('opcion')
 @click.argument('pid')
@@ -248,12 +223,8 @@ def demonio(opcion, pid):
         print('Ocurrio un error o el comando se utilizo incorrectamente.')
         log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
         
-<<<<<<< HEAD
-        
-=======
 #comando renombrar, recibe como parametro el nombre a cambiar y el nuevo nombre
 # utiliza la libreria os.
->>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 @cli.command()
 @click.argument('origen')
 @click.argument('destino')
