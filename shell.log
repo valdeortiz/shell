@@ -1,0 +1,124 @@
+2022-01-06 15:07:00,543 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 15:07:11,167 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: diractual() got an unexpected keyword argument 'l'
+
+2022-01-06 15:23:43,329 root INFO Se ejecuto el comando -- nombrehost 
+2022-01-06 15:24:52,038 root INFO Se ejecuto el comando -- creadir /root/cosas/hola
+2022-01-06 15:24:59,864 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 15:25:12,031 root INFO Se ejecuto el comando -- ir /root
+2022-01-06 15:25:12,031 root INFO Se ejecuto el comando -- cambio al directorio: /root
+2022-01-06 15:25:16,348 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 15:25:32,558 root INFO Se ejecuto el comando -- ir /cosas
+2022-01-06 15:25:32,559 root ERROR Error al ejecutar el comando <ir>, el directorio no existe
+2022-01-06 15:25:35,322 root INFO Se ejecuto el comando -- ir cosas
+2022-01-06 15:25:35,322 root INFO Se ejecuto el comando -- cambio al directorio: /root/cosas
+2022-01-06 15:25:41,973 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 15:40:19,733 root INFO Se ejecuto el comando -- uso-disco /root
+2022-01-06 15:40:48,846 root INFO Se ejecuto el comando -- ejecutar ls
+2022-01-06 15:40:57,143 root INFO Se ejecuto el comando -- ejecutar du
+2022-01-06 15:42:58,503 root INFO Se ejecuto el comando -- uso-disco /root/cosas
+2022-01-06 23:12:25,663 root INFO Se ejecuto el comando -- ccontra pedro, contrasena: hola
+2022-01-06 23:32:02,118 root INFO Se ejecuto el comando -- ccontra pedro, contrasena: hola
+2022-01-06 23:32:02,119 root ERROR Error Usuario incorrecto -> al ejecutar <ccontra>
+2022-01-06 23:37:25,906 root INFO Se ejecuto el comando -- ccontra pedro, contrasena: hola
+2022-01-06 23:45:44,989 root INFO Se ejecuto el comando -- ccontra pedro, contrasena: pedro
+2022-01-06 21:27:52,562 Shell_transferencias.log INFO Inicio de sesion de bob
+2022-01-06 21:30:35,279 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:30:51,439 root INFO Se ejecuto el comando -- ejecutar pwd
+2022-01-06 21:30:56,558 root INFO Se ejecuto el comando -- ir ..
+2022-01-06 21:30:56,559 root INFO Se ejecuto el comando -- cambio al directorio: /home/bob
+2022-01-06 21:31:19,415 root INFO Se ejecuto el comando -- creadir hola
+2022-01-06 21:31:22,571 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:32:13,631 root INFO Se ejecuto el comando -- ir hola
+2022-01-06 21:32:13,631 root INFO Se ejecuto el comando -- cambio al directorio: /home/bob/hola
+2022-01-06 21:32:32,543 root INFO Se ejecuto el comando -- ejecutar vi prueba1
+2022-01-06 21:33:05,288 root INFO Se ejecuto el comando -- ir ..
+2022-01-06 21:33:05,288 root INFO Se ejecuto el comando -- cambio al directorio: /home/bob
+2022-01-06 21:33:10,631 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:33:21,679 root INFO Se ejecuto el comando -- creadir hola2
+2022-01-06 21:34:03,830 root INFO Se ejecuto el comando -- copiar /home/bob/hola /home/bob/hola2
+2022-01-06 21:34:03,831 root ERROR nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <copiar>
+2022-01-06 21:34:33,124 root INFO Se ejecuto el comando -- copiar /home/bob/hola/prueba1 /home/bob/hola2
+2022-01-06 21:34:33,125 root INFO Se ejecuto el comando -- Se copio /home/bob/hola/prueba1 a /home/bob/hola2 con exito.
+2022-01-06 21:34:48,132 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:35:03,083 root INFO Se ejecuto el comando -- ir hola2
+2022-01-06 21:35:03,084 root INFO Se ejecuto el comando -- cambio al directorio: /home/bob/hola2
+2022-01-06 21:35:06,373 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:35:16,938 root INFO Se ejecuto el comando -- ejecutar vi prueba1
+2022-01-06 21:35:34,038 root INFO Se ejecuto el comando -- renombrar hola2 hola3 
+2022-01-06 21:35:34,039 root ERROR nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>
+2022-01-06 21:36:00,845 root INFO Se ejecuto el comando -- renombrar hola2 hola3 
+2022-01-06 21:36:00,846 root ERROR nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <renombrar>
+2022-01-06 21:36:07,234 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:36:17,278 root INFO Se ejecuto el comando -- renombrar prueba1 prueba2 
+2022-01-06 21:36:22,317 root INFO Se ejecuto el comando -- listardirectorios 
+2022-01-06 21:36:39,632 root INFO Se ejecuto el comando -- ejecutar vi prueba2
+2022-01-06 21:45:42,139 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: demonio() got an unexpected keyword argument 'pid'
+
+2022-01-06 21:47:57,254 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: demonio() got an unexpected keyword argument 'pid'
+
+2022-01-06 21:48:41,690 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: demonio() got an unexpected keyword argument 'pid'
+
+2022-01-06 21:49:57,362 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: demonio() got an unexpected keyword argument 'pid'
+
+2022-01-06 21:57:04,278 click_shell.core WARNING Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/click_shell/core.py", line 34, in invoke_
+    command.main(args=shlex.split(arg),
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1053, in main
+    rv = self.invoke(ctx)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/usr/lib/python3.9/site-packages/click/core.py", line 754, in invoke
+    return __callback(*args, **kwargs)
+TypeError: demonio() got an unexpected keyword argument 'pid'
+
+2022-01-06 21:58:24,652 root ERROR  codigo del error: name 'signal' is not defined -> al ejecutar <demonio>
+2022-01-06 22:07:26,357 root ERROR  codigo del error: name 'signal' is not defined -> al ejecutar <demonio>
+2022-01-06 22:25:53,900 root ERROR  codigo del error: name 'subprocess' is not defined -> al ejecutar <demonio>
+2022-01-06 22:26:59,952 root ERROR  codigo del error: 'int' object is not iterable -> al ejecutar <demonio>
+2022-01-06 22:28:10,609 root ERROR  codigo del error: [Errno 2] No such file or directory: '312' -> al ejecutar <demonio>
+2022-01-06 22:28:30,932 root ERROR  codigo del error: [Errno 3] No such process -> al ejecutar <demonio>

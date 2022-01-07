@@ -10,6 +10,8 @@ import socket
 from os import listdir
 import fileinput
 import crypt
+import signal
+import subprocess
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
@@ -178,16 +180,16 @@ def creardir(direccion):
 
 @cli.command()
 @click.argument('opcion')
-@click.argument('PID')
-def demonio(opcion, PID):
+@click.argument('pid')
+def demonio(opcion, pid):
     """Levanta o apaga demonios. Necesita como parametro
     la accion y el ID de proceso en caso de apagar,
     y el archivo a ejecutar en caso de levantar."""
     try:
         if (opcion == 'levantar'):
             try:
-                subprocess.Popen(PID)
-                log(f"demonio {opcion} {PID}")
+                subprocess.Popen(pid)
+                log(f"demonio {opcion} {pid}")
             except Exception as e:
                 print(e)
                 print('Ocurrio un error o el parametro introducido es invalido.')
@@ -195,7 +197,9 @@ def demonio(opcion, PID):
         elif (opcion == 'apagar'):
             try:
                 # SIGKILL no puede ser ignorado, SIGTERM si
-                pid = int(PID)
+                print(pid)
+                pid = int(pid)
+                
                 os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
                 log(f"demonio {opcion} {PID}")
@@ -303,16 +307,21 @@ def ccontra(usuario, contra):
         # kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1 → este es el hash propiamente dicho.
         # TODO: Cambiar a /etc/shadow
         existe_usuario = False
-        with fileinput.FileInput(archivo_usuario, backup='_old', inplace=True) as file:
+        with fileinput.FileInput(archivo, backup='_old', inplace=True) as file:
             for line in file:
-                datos: list = line.split(' ')
+                datos = line.split(':')
                 if usuario == datos[0]:
                     # datos = line.split(':')
                     contra_hash = crypt.crypt(contra, salt=crypt.mksalt())
                     # print(line.replace(datos[2], contra_hash))
-                    datos.insert(1, contra_hash)
-                    datos.pop()
-                    print(*datos)
+                    #datos.insert(1, contra_hash)
+                    datos[1]=contra_hash
+                    #datos.pop()
+                    # print(*datos)
+                    info = ''
+                    for index, value in enumerate(datos):
+                        info +=f"{value}{':' if index!=len(datos) -1 else''}"
+                    print(info)
                     existe_usuario = True
                 else:
                     if line != '\n':
@@ -321,7 +330,7 @@ def ccontra(usuario, contra):
                 if not existe_usuario:
                     raise Exception("Usuario incorrecto")
 
-                    
+
     except Exception as e:
         click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
         log_error.error(f"Error {e} -> al ejecutar <ccontra>")
