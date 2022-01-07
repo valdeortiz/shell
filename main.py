@@ -20,10 +20,14 @@ archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios
 
 
 
+#variables globales del código:
+#archivo_usuario: contiene el path junto al nombre del archivo donde se guardará la 
+#información de los usuarios creados con la shell, la información consiste en su nombre, 
+#hora de entrada, hora de salida y su ip de conexión
 # archivo = "/var/log" path para lfs
-archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
-archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-archivo_tranaferencias = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+archivo_usuario = "/var/log/usuarios.log"
+archivo_personal_horarios = "/var/log/usuario_horarios.log"
+archivo_personal_transferencias = "/var/log/Shell_transferencias.log"
 
 
 # Creamos nuestro logger principal y usamos el metodo basicConfig para configurar
@@ -51,19 +55,9 @@ def cli():
     pass
 
 
-@cli.command()
-def bienvenida():
-    """emite un mensaje de bienvenida """
-    click.echo("Bienvenido!")
-    pass
-
-
-@cli.command()
-def salida():
-    """Termina el loop y emite un mensaje de despedida """
-    click.echo("Hasta pronto!")
-    return True
-
+#Comando ir, se utiliza para cambiar de directorio, recibe como parametro la 
+#ruta del directorio la cual de ser posible se convierte en el nuevo
+#working directory, utiliza la libreria os.
 @cli.command()
 @click.argument('ruta',nargs=1)
 def ir(ruta):
@@ -81,17 +75,24 @@ def ir(ruta):
         click.echo(f"Error {e}-> Ejecute help <ir> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <ir> ")
 
+#comando diractual, sirve para imprimir en pantalla
+#el directorio de trabajo actual,el comando recibe un argumento, este argumento debe ser vacio, 
+#esto es para verificarque el comando no reciba argumentos demas, 
+#utiliza la libreria os.
 @cli.command()
 @click.argument('l', default='')
-def diractual():
+def diractual(l):
 
     """Imprime en pantalla el directorio actual"""
-    log("diractual")
+    log(f"diractual {l}")
     try:
         click.echo(f"Directorio actual: {os.getcwd()}")
     except:
         log_error.error("Error al mostrar el directorio actual.")
 
+#comando copiar, recibe como parametro el archivo a copiar junto con su path en caso
+# que no se encuentre en el directorio actual y el directorio destino donde se creara
+#una copia del archivo indicado, utiliza la libreria os.
 @cli.command()
 @click.argument('origen',  nargs=1)
 @click.argument('destino', nargs=1)
@@ -113,15 +114,17 @@ def copiar(origen,destino):
         print(f"Error {e}-> Ejecute help <copiar> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <copiar> ")
 
+#comando propietarios, recibe como parametro el archivo junto a su path de no encontrarse en el directorio
+#actual el nuevo usuario y/o nuevo grupo, utiliza la libreria os.
 @cli.command()
+@click.argument('archivo',nargs=1)
 @click.argument('usuario',nargs=1)
 @click.argument('grupo', nargs=1)
-@click.argument('archivo',nargs=1)
-def propietarios(usuario,grupo,archivo):
+def propietarios(archivo,usuario,grupo):
     """Cambia el propietario de un directorio"""
     try:
         if os.path.exists(archivo):
-            log(f"propietarios {grupo}  {usuario} {archivo}")
+            log(f"propietarios {archivo} {usuario} {grupo}")
             os.chown(archivo, usuario, grupo)
         else:
             click.echo("Error -> nombres y archivos especificados no válidos o no es posible modificarlos.")
@@ -133,6 +136,9 @@ def propietarios(usuario,grupo,archivo):
         print(f"Error {e}-> Ejecute help <propietarios> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <propietarios> ")
 
+#comando nombrehost, imprime en pantalla el nombre del anfitrion de la maquina,
+#el comando recibe un argumento, este argumento debe ser vacio, esto es para verificar
+#que el comando no reciba argumentos demas,utiliza la libreria socket.
 @cli.command()
 @click.argument('l', default='')
 def nombrehost(l):
@@ -148,6 +154,11 @@ def nombrehost(l):
         click.echo("Error al ejecutar el comando nombrehost")
         log_error.error("Error al ejecutar el comando nombrehost")
 
+        
+#comando para listar los directorios y archivos dentro de un directorio, imprime en
+#pantalla todos los directorios y archivos dentro del directorio actual,el comando recibe un argumento, este argumento debe ser vacio, 
+#esto es para verificar que el comando no reciba argumentos demas, es posible cambiar la forma en la los elementos se
+#imprimen, todos los datos se encuentran en la variable "lista", utiliza la libreria os.
 @cli.command()
 @click.argument('l', default='')
 def listardirectorios(l):
@@ -164,7 +175,8 @@ def listardirectorios(l):
     except click.ClickException as e:
         click.echo(f" Error: {e} -> al ejecutar <listardirectorios>")
         log_error.error(f" codigo del error: {e} -> al ejecutar <listardirectorios>")
-
+#comando para crear un directorio, recibe como parametro el nombre o el nombre más el path donde 
+#desea crear un directorio, utiliza la libreria os.
 @cli.command()
 @click.argument('direccion')
 def creardir(direccion):
@@ -178,7 +190,7 @@ def creardir(direccion):
     except Exception as e:
         click.echo(f" Error: {e} -> al ejecutar <creadir>")
         log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
-
+#comando para levantar o apagar un demonio
 @cli.command()
 @click.argument('opcion')
 @click.argument('pid')
