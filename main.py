@@ -13,6 +13,7 @@ import crypt
 import signal
 import subprocess
 from datetime import datetime
+<<<<<<< HEAD
 # archivo = "/var/log" path para lfs
 archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
 archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
@@ -28,14 +29,20 @@ archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios
 archivo_usuario = "/var/log/usuarios.log"
 archivo_personal_horarios = "/var/log/usuario_horarios.log"
 archivo_personal_transferencias = "/var/log/Shell_transferencias.log"
+=======
+>>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 
 
 
 
+#variables globales del código:
+#archivo_usuario: contiene el path junto al nombre del archivo donde se guardará la 
+#información de los usuarios creados con la shell, la información consiste en su nombre, 
+#hora de entrada, hora de salida y su ip de conexión
 # archivo = "/var/log" path para lfs
-archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
-archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+archivo_usuario = "/var/log/usuarios.log"
+archivo_personal_horarios = "/var/log/usuario_horarios.log"
+archivo_personal_transferencias = "/var/log/Shell_transferencias.log"
 
 
 # Creamos nuestro logger principal y usamos el metodo basicConfig para configurar
@@ -43,13 +50,13 @@ logging.basicConfig(level=logging.INFO,
                     # formato del horario (YYYY-MM-DD hh:min:sec),
                     format='%(asctime)s %(name)s %(levelname)s %(message)s',
                     # name es el user, asctime es hora y fecha, levelname: severidad, message: mensaje del error.
-                    filename="shell.log")
+                    filename="/var/log/shell.log")
 
 # creamos otro logger para guardar los errores del sistema
 # cambiar el nombre del archivo a el path del log donde se desea guardar los errores
 # los errores de comandos van separados de los errores de inicio de sesion
 log_error = logging.getLogger("")
-fhp = logging.FileHandler("errores.log")
+fhp = logging.FileHandler("/var/log/errores.log")
 fhp.setLevel(logging.ERROR)
 log_error.addHandler(fhp)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -162,6 +169,10 @@ def nombrehost(l):
         click.echo("Error al ejecutar el comando nombrehost")
         log_error.error("Error al ejecutar el comando nombrehost")
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 #comando para listar los directorios y archivos dentro de un directorio, imprime en
 #pantalla todos los directorios y archivos dentro del directorio actual,el comando recibe un argumento, este argumento debe ser vacio, 
 #esto es para verificar que el comando no reciba argumentos demas, es posible cambiar la forma en la los elementos se
@@ -197,7 +208,12 @@ def creardir(direccion):
     except Exception as e:
         click.echo(f" Error: {e} -> al ejecutar <creadir>")
         log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
+<<<<<<< HEAD
 #comando para levantar o apagar un demonio
+=======
+#comando para levantar o apagar un demonio, utiliza el paquete signal y la libreria subprocess
+#recibe como parametro la opcion ya sea levantar o apagar y el pid del proceso.
+>>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 @cli.command()
 @click.argument('opcion')
 @click.argument('pid')
@@ -232,7 +248,12 @@ def demonio(opcion, pid):
         print('Ocurrio un error o el comando se utilizo incorrectamente.')
         log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
         
+<<<<<<< HEAD
         
+=======
+#comando renombrar, recibe como parametro el nombre a cambiar y el nuevo nombre
+# utiliza la libreria os.
+>>>>>>> 0df6ce4f3d0678d4a256dd5623f8aaabc6ef8bd9
 @cli.command()
 @click.argument('origen')
 @click.argument('destino')
@@ -253,10 +274,10 @@ def renombrar(origen: str, destino: str) -> None:
             click.echo(f" Error: {e} -> al ejecutar <renombrar>")
             log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
 
-#os.geteuid() para saber el userid
-    #os.getgid() para saber el grupid
 
 
+#comando para cambiar los permisos de un archivo o directorio, recibe como parametro la ruta
+#del archivo a modificar y un entero que representa las opciones y campos a modificar.
 @cli.command()
 @click.argument('ruta')
 @click.argument('permisos', type=click.INT)
@@ -274,7 +295,136 @@ def cambiarpermisos(ruta, permisos: int):#Error int() can't convert non-string w
     except Exception as e:
         print(f"Error {e}-> Ejecute help <permisos> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <permisos> ")
-    
+        
+        
+#comando para mover archivos o directorios, recibe como parametros el directorio o archivo 
+# a ser movido y el path del directorio donde desea que se mueva, tambien puede ser
+# utilizado para cambiar el nombre de algun directorio.
+
+@cli.command()
+@click.argument('directorio_actual')
+@click.argument('directorio_cambiado')
+def mover(directorio_actual, directorio_cambiado):
+    """
+    Mover o renombrar un archivo o directorio.
+    Recibe dos parametros-> <directorio_actual> <directorio_cambiado>
+                          o para renombrar un archivo: <nombre_actual> <nombre_cambiado>
+    Manera de ejecutar:-> mover <directorio_actual> <directorio_a_cambiar>
+                    -> renombrar: mover <nombre_actual> <nombre_a_cambiar>
+    """
+    log(f"mover {directorio_actual} {directorio_cambiado} ")
+
+    try:
+        shutil.move(directorio_actual, directorio_cambiado)
+        click.echo(f"<{directorio_actual}> fue movido a < {directorio_cambiado} >")
+    except OSError:
+        click.echo("Error -> nombres y rutas de archivos no válidos o inaccesibles.")
+        log_error.error("nombres y rutas de archivos no válidos o inaccesibles. Al ejecutar <mover>")
+    except Exception as e:
+        click.echo(f"Error {e}-> Ejecute help <mover> para mas informacion")
+        log_error.error(f" codigo del error: {e} -> Al ejecutar mover")
+
+#comando para cambiar la contraseña de algun usuario, recibe como parametro 
+# el nombre del usuario, para luego ingresar su nueva contraseña, este comando
+#modifica el archivo /etc/shadow por lo tanto el usuario debe tener permisos de 
+#administrador
+
+@cli.command()
+@click.argument('usuario')
+@click.option('--contra', prompt="Introduce la contrasena: ", hide_input=True, required=True)
+def ccontra(usuario, contra):
+    """ Cambiar la contrasenha de un usuario
+    parametros:
+        -> [usuario]
+    Modo de Ejecucion:
+        -> ccontra [usuario]
+    """
+    # os.system(f"passwd {args}")
+    # contra_nueva = getpass.getpass("Introduce el nuevo password")
+    # click.echo(contra_nueva)
+    # verificar si se cambia contrase;a en usuarios_log
+    try:
+        log(f"ccontra {usuario}, contrasena: {contra}")
+        # TODO: Cambiar, no se puede utilizar passwd
+        # os.system(f"passwd {usuario}")
+        archivo = "/etc/shadow"
+#         # zeus:$6$jq62gTbU$kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1:17739:0:99999:7:::
+#         Los campos se separan por :; el primer campo es el usuario y el segundo, el hash de su password. Este hash tiene la forma $id$salt$hashed, y cada parte significa algo:
+
+        # 6 → es algoritmo usado para el hash, donde “6” significa SHA-512.
+        # jq62gTbU → el algoritmo SHA-512 requiere de un salt para combinar con la contraseña antes del hash, por seguridad.
+        # kYZgWuKLuNTX0Ur.UWiuBJuIYltW3hc7EdI2/4RpldwUoLlRl9IdXgJb6B3kxEoAxWolDwXDCqOnz8SN0CKkJ1 → este es el hash propiamente dicho.
+        # TODO: Cambiar a /etc/shadow
+        existe_usuario = False
+        with fileinput.FileInput(archivo, backup='_old', inplace=True) as file:
+            for line in file:
+                datos = line.split(':')
+                if usuario == datos[0]:
+                    # datos = line.split(':')
+                    contra_hash = crypt.crypt(contra, salt=crypt.mksalt())
+                    # print(line.replace(datos[2], contra_hash))
+                    #datos.insert(1, contra_hash)
+                    datos[1]=contra_hash
+                    #datos.pop()
+                    # print(*datos)
+                    info = ''
+                    for index, value in enumerate(datos):
+                        info +=f"{value}{':' if index!=len(datos) -1 else''}"
+                    print(info)
+                    existe_usuario = True
+                else:
+                    if line != '\n':
+                        print(line.replace('\n', ''))
+            else:
+                if not existe_usuario:
+                    raise Exception("Usuario incorrecto")
+
+
+    except Exception as e:
+        click.echo(f"Error {e} -> Ejecute help <ccontra> para mas informacion")
+        log_error.error(f"Error {e} -> al ejecutar <ccontra>")
+
+
+@cli.command()
+@click.argument('url')
+def ftp(url):
+    """Ftp brinda la posibilad de conectarse a traves del protocolo FTP. Posibilitando la tranferencia o descarga de un archivo
+    Parametros: [urlFtp] -> Url del servidor FTP.
+    Ejecucion: ftp [urlFtp]
+    """
+    # https://dlptest.com/ftp-test/
+
+    log(f"ftp {url} ")
+    try:
+        ftp = ftplib.FTP(url, timeout=100)
+        usuario = input("Introduce el usuario: ")
+        contra = getpass.getpass("Introduce la contrasenha: ")
+        ftp.login(usuario, contra)
+        # ftp.retrlines("LIST")
+        # (cmd, fp) cmd debe ser un RERT apropiado y fp el archivo destino
+        # FTP.storlines(cmd, fp) para subir archivos
+        # ftp.storbinary('STOR archivo2.txt', text_file)
+        # ftp.retrbinary('RETR FTP.txt', open('archivodescargado.txt', 'wb').write)
+        dec = int(input("1 - subir || 2 - descargar || 3 - salir -> "))
+        while dec != 3:
+            if dec == 1:
+                archivo = input("Introduce el nombre del archivo(obs: con su extension al final): ")
+                file = open(archivo, 'rb')
+                ftp.storbinary(f'STOR {archivo}', file)
+                ftp.retrlines('LIST')
+            else:
+                ftp.retrlines('LIST')
+                archivo = input("Introduce el nombre del archivo(obs: con su extension al final)")
+                ftp.retrbinary(f'RETR {archivo}', open(archivo, 'wb').write)
+            with open("transferencia_log", "a+") as transferencia:
+                transferencia.write(f"se realizo una transferencia ftp con el {usuario} en {url} ")
+            dec = int(input("1 - subir || 2 - descargar || 3 - salir"))
+
+        ftp.quit()
+    except Exception as e:
+        log_error.error(f"Error {e} -> al ejecutar <ftp>")
+        click.echo("no se pudo conectar")
+        click.echo(e)
 
 @cli.command()
 @click.argument('directorio_actual')
