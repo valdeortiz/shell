@@ -16,8 +16,9 @@ Ejecutar: ``` git clone https://github.com/valdeortiz/shell.git ```
 o decargar en el repositorio. En la seccion de clone, click en "Descargar en zip"
 
 
-***
 
+
+***
 ## Pre-requisitos 📋.
 
 - Se necesita tener instalado python 3.6 en adelante, que viene instalado en la mayoria de distribuciones GNU/Linux. Para asegurarse cual version se encuentra instalado en tu maquina. Ejecuta: `python --version`
@@ -26,14 +27,18 @@ o decargar en el repositorio. En la seccion de clone, click en "Descargar en zip
 
 - Seguir las intruciones del enunciado anterior para la Descarga del repositorio.
 
-
+***
 ### Ejecucion 🔩
 Desde nuestro interprete de comandos(host, ejemplo bash o zsh). Ingresamos a la carpeta donde se encuentra el repositorio previamente descargado o clonado. Ejecutamos:
 
     python main.py
+    
+***
+## Instalación(opcional) :arrow_backward:
+Utilizar el comando: 'pip install <ubicación donde descargo el archivo>'
+Luego para ejecutar en cualquier momento desde linea de comando utilizar: 'shell'
 
 ***
-
 ## Construido con 🛠️
 
 - [Python version >3.6.X](https://www.python.org/ "Pagina oficial del lenguaje de programacion Python")
