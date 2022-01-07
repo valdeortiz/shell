@@ -2,12 +2,11 @@ from setuptools import setup
 setup(
      name="shell",
      version='0.1',
-     py_modules=['shell'],
      install_requires=[
-                    'Click',
+                    'Click','click-shell','signals',
      ],
      entry_points='''
      [console_scripts]
-     shell=shell:cli
+     shell=main:cli
 ''',
 )
