@@ -13,10 +13,7 @@ import crypt
 import signal
 import subprocess
 from datetime import datetime
-# archivo = "/var/log" path para lfs
-archivo_usuario = "usuarios_log"  # /var/log/usuarios_log
-archivo_personal_horarios = "usuario_horarios.log"  # /var/log/(usuario_horarios_log)
-# archivo_personal_horarios = "Shell_transferencias.log"  # /var/log/(usuario_horarios_log)
+
 
 
 
@@ -35,13 +32,13 @@ logging.basicConfig(level=logging.INFO,
                     # formato del horario (YYYY-MM-DD hh:min:sec),
                     format='%(asctime)s %(name)s %(levelname)s %(message)s',
                     # name es el user, asctime es hora y fecha, levelname: severidad, message: mensaje del error.
-                    filename="shell.log")
+                    filename="/var/log/shell.log")
 
 # creamos otro logger para guardar los errores del sistema
 # cambiar el nombre del archivo a el path del log donde se desea guardar los errores
 # los errores de comandos van separados de los errores de inicio de sesion
 log_error = logging.getLogger("")
-fhp = logging.FileHandler("errores.log")
+fhp = logging.FileHandler("/var/log/errores.log")
 fhp.setLevel(logging.ERROR)
 log_error.addHandler(fhp)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -190,7 +187,8 @@ def creardir(direccion):
     except Exception as e:
         click.echo(f" Error: {e} -> al ejecutar <creadir>")
         log_error.error(f" codigo del error: {e} -> al ejecutar <creadir>")
-#comando para levantar o apagar un demonio
+#comando para levantar o apagar un demonio, utiliza el paquete signal y la libreria subprocess
+#recibe como parametro la opcion ya sea levantar o apagar y el pid del proceso.
 @cli.command()
 @click.argument('opcion')
 @click.argument('pid')
@@ -225,7 +223,8 @@ def demonio(opcion, pid):
         print('Ocurrio un error o el comando se utilizo incorrectamente.')
         log_error.error(f" codigo del error: {e} -> al ejecutar <demonio>")
         
-        
+#comando renombrar, recibe como parametro el nombre a cambiar y el nuevo nombre
+# utiliza la libreria os.
 @cli.command()
 @click.argument('origen')
 @click.argument('destino')
@@ -246,10 +245,10 @@ def renombrar(origen: str, destino: str) -> None:
             click.echo(f" Error: {e} -> al ejecutar <renombrar>")
             log_error.error(f" codigo del error: {e} -> al ejecutar <renombrar>")
 
-#os.geteuid() para saber el userid
-    #os.getgid() para saber el grupid
 
 
+#comando para cambiar los permisos de un archivo o directorio, recibe como parametro la ruta
+#del archivo a modificar y un entero que representa las opciones y campos a modificar.
 @cli.command()
 @click.argument('ruta')
 @click.argument('permisos', type=click.INT)
@@ -267,7 +266,11 @@ def cambiarpermisos(ruta, permisos: int):#Error int() can't convert non-string w
     except Exception as e:
         print(f"Error {e}-> Ejecute help <permisos> para mas informacion")
         log_error.error(f"codigo del error: {e} -> al ejecutar <permisos> ")
-
+        
+        
+#comando para mover archivos o directorios, recibe como parametros el directorio o archivo 
+# a ser movido y el path del directorio donde desea que se mueva, tambien puede ser
+# utilizado para cambiar el nombre de algun directorio.
 
 @cli.command()
 @click.argument('directorio_actual')
@@ -292,6 +295,10 @@ def mover(directorio_actual, directorio_cambiado):
         click.echo(f"Error {e}-> Ejecute help <mover> para mas informacion")
         log_error.error(f" codigo del error: {e} -> Al ejecutar mover")
 
+#comando para cambiar la contraseña de algun usuario, recibe como parametro 
+# el nombre del usuario, para luego ingresar su nueva contraseña, este comando
+#modifica el archivo /etc/shadow por lo tanto el usuario debe tener permisos de 
+#administrador
 
 @cli.command()
 @click.argument('usuario')
